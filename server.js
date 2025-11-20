@@ -1,5 +1,14 @@
+const http = require('http');
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: process.env.PORT || 8080 });
+
+// Crea un servidor HTTP básico
+const server = http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end("Servidor Styceht Drift activo.");
+});
+
+// Crea el servidor WebSocket sobre el HTTP
+const wss = new WebSocket.Server({ server });
 
 let clients = [];
 
@@ -12,4 +21,10 @@ wss.on('connection', (ws) => {
       }
     });
   });
+});
+
+// Railway asigna el puerto automáticamente
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
+  console.log(`Servidor escuchando en puerto ${PORT}`);
 });
