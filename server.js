@@ -1,13 +1,13 @@
 const http = require('http');
 const WebSocket = require('ws');
 
-// Crea un servidor HTTP básico
+// Servidor HTTP básico para evitar "Upgrade Required"
 const server = http.createServer((req, res) => {
   res.writeHead(200);
   res.end("Servidor Styceht Drift activo.");
 });
 
-// Crea el servidor WebSocket sobre el HTTP
+// WebSocket sobre HTTP
 const wss = new WebSocket.Server({ server });
 
 let clients = [];
@@ -15,16 +15,21 @@ let clients = [];
 wss.on('connection', (ws) => {
   clients.push(ws);
   ws.on('message', (msg) => {
+    // Reenviar a todos los demás clientes
     clients.forEach(client => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(msg);
       }
     });
   });
+
+  ws.on('close', () => {
+    clients = clients.filter(c => c !== ws);
+  });
 });
 
-// Railway asigna el puerto automáticamente
+// Puerto asignado por Railway
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
-  console.log(`Servidor escuchando en puerto ${PORT}`);
+  console.log(`Servidor Styceht Drift activo en puerto ${PORT}`);
 });
